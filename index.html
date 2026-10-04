@@ -27,6 +27,10 @@
         .horse-track {
             transition: left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
+        .flip-horse {
+            transform: scaleX(-1);
+            display: inline-block;
+        }
         @keyframes horseGallop {
             0% { transform: translateY(0) rotate(0deg); }
             25% { transform: translateY(-6px) rotate(-8deg); }
@@ -46,6 +50,41 @@
 
     <div class="w-full max-w-md h-full flex flex-col justify-between bg-slate-900 shadow-2xl relative overflow-hidden">
 
+        <!-- ================= START MENU OVERLAY ================= -->
+        <div id="start-menu" class="absolute inset-0 bg-slate-900 z-50 flex flex-col justify-between p-6 text-white text-center">
+            <div class="mt-8">
+                <div class="text-6xl mb-2 animate-bounce">🐎💨</div>
+                <h1 class="text-3xl font-black tracking-wider text-yellow-400">BALAPAN KUDA</h1>
+                <h2 class="text-xl font-bold text-slate-300">MATEMATIKA 2 PLAYER</h2>
+                <p class="text-xs text-slate-400 mt-2">Ayo beradu cepat berhitung bersama temanmu!</p>
+            </div>
+
+            <div class="flex flex-col gap-2.5 my-auto w-full max-w-xs mx-auto">
+                <p class="text-xs font-black tracking-widest text-emerald-400 uppercase mb-1">Pilih Mode Permainan</p>
+
+                <button onclick="startGame('free')" class="w-full bg-slate-800 border-2 border-slate-600 hover:bg-slate-700 text-white font-black py-3 rounded-2xl shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+                    🎯 Mode Bebas (Bisa Ganti-Ganti)
+                </button>
+                <button onclick="startGame('x')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-2xl shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+                    ✖️ Perkalian Saja
+                </button>
+                <button onclick="startGame(':')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-black py-3 rounded-2xl shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+                    ➗ Pembagian Saja
+                </button>
+                <button onclick="startGame('+')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-2xl shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+                    ➕ Penjumlahan Saja
+                </button>
+                <button onclick="startGame('-')" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-black py-3 rounded-2xl shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+                    ➖ Pengurangan Saja
+                </button>
+                <button onclick="startGame('mix')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-black py-3 rounded-2xl shadow-lg active:scale-95 transition flex items-center justify-center gap-2">
+                    🔀 Mode Campuran (Acak)
+                </button>
+            </div>
+
+            <p class="text-[10px] text-slate-500 mb-2">Pemain 1 di Atas | Pemain 2 di Bawah</p>
+        </div>
+
         <!-- ================= PLAYER 1 (TOP - ROTATED 180 DEG) ================= -->
         <div class="upside-down flex-1 flex flex-col justify-between p-2 sm:p-3 bg-slate-50 border-b-4 border-blue-500 relative">
             
@@ -54,13 +93,18 @@
                 <div class="flex justify-between items-center text-xs">
                     <div class="flex items-center gap-1">
                         <span class="bg-blue-600 text-white font-black px-2 py-0.5 rounded-full text-xs">KUDA 1</span>
-                        <!-- Operator Toggle -->
-                        <div class="flex bg-slate-200 rounded-lg p-0.5 border border-slate-300">
-                            <button id="p1-op-mult" onclick="setOperator(1, 'x')" class="px-2 py-0.5 text-xs font-black rounded-md bg-blue-600 text-white shadow">×</button>
-                            <button id="p1-op-div" onclick="setOperator(1, ':')" class="px-2 py-0.5 text-xs font-black rounded-md text-slate-600">:</button>
+                        <!-- Operator Toggle (X, :, +, -) -->
+                        <div id="p1-op-container" class="flex bg-slate-200 rounded-lg p-0.5 border border-slate-300 gap-0.5">
+                            <button id="p1-op-mult" onclick="setOperator(1, 'x')" class="px-1.5 py-0.5 text-xs font-black rounded-md bg-blue-600 text-white shadow">×</button>
+                            <button id="p1-op-div" onclick="setOperator(1, ':')" class="px-1.5 py-0.5 text-xs font-black rounded-md text-slate-600">:</button>
+                            <button id="p1-op-add" onclick="setOperator(1, '+')" class="px-1.5 py-0.5 text-xs font-black rounded-md text-slate-600">+</button>
+                            <button id="p1-op-sub" onclick="setOperator(1, '-')" class="px-1.5 py-0.5 text-xs font-black rounded-md text-slate-600">-</button>
                         </div>
                     </div>
-                    <span id="p1-score" class="text-blue-600 font-black text-sm">0 / 5</span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="showMenu()" class="bg-slate-200 hover:bg-slate-300 px-2 py-0.5 rounded-full text-xs font-bold text-slate-700">🏠 Menu</button>
+                        <span id="p1-score" class="text-blue-600 font-black text-sm">0 / 5</span>
+                    </div>
                 </div>
                 
                 <!-- Question Box & Input Display -->
@@ -73,7 +117,7 @@
                 </div>
             </div>
 
-            <!-- SEPARATE TRACK FOR PLAYER 1 -->
+            <!-- TRACK FOR PLAYER 1 -->
             <div class="my-1 h-16 bg-emerald-600 rounded-xl relative border-2 border-emerald-700 overflow-hidden shadow-inner flex items-center">
                 <div class="absolute left-10 top-0 bottom-0 w-1 border-r-2 border-dashed border-white/80 z-10"></div>
                 <div class="absolute right-0 top-0 bottom-0 w-6 checkered z-10 border-l border-white/60"></div>
@@ -81,7 +125,7 @@
                 <div id="horse1" class="horse-track absolute left-0 z-20 flex items-center">
                     <div class="flex items-center bg-white/95 px-2 py-1 rounded-2xl shadow-lg border-2 border-blue-500">
                         <span class="text-xs bg-blue-600 text-white font-black w-5 h-5 rounded-full flex items-center justify-center mr-1">1</span>
-                        <span id="horse1-icon" class="text-4xl leading-none filter drop-shadow">🐎</span>
+                        <span id="horse1-icon" class="text-4xl leading-none filter drop-shadow flip-horse">🐎</span>
                     </div>
                 </div>
             </div>
@@ -106,7 +150,7 @@
         <!-- ================= PLAYER 2 (BOTTOM - NORMAL) ================= -->
         <div class="flex-1 flex flex-col justify-between p-2 sm:p-3 bg-slate-50 border-t-4 border-red-500 relative">
             
-            <!-- SEPARATE TRACK FOR PLAYER 2 -->
+            <!-- TRACK FOR PLAYER 2 -->
             <div class="my-1 h-16 bg-emerald-600 rounded-xl relative border-2 border-emerald-700 overflow-hidden shadow-inner flex items-center">
                 <div class="absolute left-10 top-0 bottom-0 w-1 border-r-2 border-dashed border-white/80 z-10"></div>
                 <div class="absolute right-0 top-0 bottom-0 w-6 checkered z-10 border-l border-white/60"></div>
@@ -114,7 +158,7 @@
                 <div id="horse2" class="horse-track absolute left-0 z-20 flex items-center">
                     <div class="flex items-center bg-white/95 px-2 py-1 rounded-2xl shadow-lg border-2 border-red-500">
                         <span class="text-xs bg-red-600 text-white font-black w-5 h-5 rounded-full flex items-center justify-center mr-1">2</span>
-                        <span id="horse2-icon" class="text-4xl leading-none filter drop-shadow">🐎</span>
+                        <span id="horse2-icon" class="text-4xl leading-none filter drop-shadow flip-horse">🐎</span>
                     </div>
                 </div>
             </div>
@@ -124,13 +168,18 @@
                 <div class="flex justify-between items-center text-xs">
                     <div class="flex items-center gap-1">
                         <span class="bg-red-600 text-white font-black px-2 py-0.5 rounded-full text-xs">KUDA 2</span>
-                        <!-- Operator Toggle -->
-                        <div class="flex bg-slate-200 rounded-lg p-0.5 border border-slate-300">
-                            <button id="p2-op-mult" onclick="setOperator(2, 'x')" class="px-2 py-0.5 text-xs font-black rounded-md bg-red-600 text-white shadow">×</button>
-                            <button id="p2-op-div" onclick="setOperator(2, ':')" class="px-2 py-0.5 text-xs font-black rounded-md text-slate-600">:</button>
+                        <!-- Operator Toggle (X, :, +, -) -->
+                        <div id="p2-op-container" class="flex bg-slate-200 rounded-lg p-0.5 border border-slate-300 gap-0.5">
+                            <button id="p2-op-mult" onclick="setOperator(2, 'x')" class="px-1.5 py-0.5 text-xs font-black rounded-md bg-red-600 text-white shadow">×</button>
+                            <button id="p2-op-div" onclick="setOperator(2, ':')" class="px-1.5 py-0.5 text-xs font-black rounded-md text-slate-600">:</button>
+                            <button id="p2-op-add" onclick="setOperator(2, '+')" class="px-1.5 py-0.5 text-xs font-black rounded-md text-slate-600">+</button>
+                            <button id="p2-op-sub" onclick="setOperator(2, '-')" class="px-1.5 py-0.5 text-xs font-black rounded-md text-slate-600">-</button>
                         </div>
                     </div>
-                    <span id="p2-score" class="text-red-600 font-black text-sm">0 / 5</span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="showMenu()" class="bg-slate-200 hover:bg-slate-300 px-2 py-0.5 rounded-full text-xs font-bold text-slate-700">🏠 Menu</button>
+                        <span id="p2-score" class="text-red-600 font-black text-sm">0 / 5</span>
+                    </div>
                 </div>
                 
                 <!-- Question Box & Input Display -->
@@ -165,10 +214,15 @@
             <div class="bg-white w-full max-w-xs rounded-3xl p-6 text-center shadow-2xl border-4 border-yellow-400 transform scale-100 transition-all">
                 <div class="text-6xl mb-3 animate-bounce">🏆</div>
                 <h2 id="win-text" class="text-2xl font-black mb-1">KUDA 1 MENANG!</h2>
-                <p class="text-xs text-slate-500 font-bold mb-6">Mencapai garis finish paling awal!</p>
-                <button onclick="resetGame()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3.5 rounded-2xl shadow-lg active:scale-95 transition text-lg tracking-wide">
-                    MAIN LAGI 🔄
-                </button>
+                <p class="text-xs text-slate-500 font-bold mb-4">Mencapai garis finish paling awal!</p>
+                <div class="flex flex-col gap-2">
+                    <button onclick="resetGame()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3 rounded-2xl shadow-lg active:scale-95 transition text-base tracking-wide">
+                        MAIN LAGI 🔄
+                    </button>
+                    <button onclick="showMenu()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2.5 rounded-2xl active:scale-95 transition text-sm">
+                        MENU UTAMA 🏠
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -179,6 +233,7 @@
         let p1Score = 0, p2Score = 0;
         let p1Input = "", p2Input = "";
         let p1Op = "x", p2Op = "x";
+        let currentGameMode = "free";
         let p1Q = {}, p2Q = {};
         let gameOver = false;
 
@@ -202,14 +257,58 @@
             } catch(e){}
         }
 
-        // Generate Random Math Question (Multiplication or Division without decimal)
+        function startGame(mode) {
+            playBeep(523, 'sine', 0.1);
+            currentGameMode = mode;
+            document.getElementById('start-menu').classList.add('hidden');
+
+            const opContainers = [document.getElementById('p1-op-container'), document.getElementById('p2-op-container')];
+
+            if (mode === 'free') {
+                opContainers.forEach(c => c.classList.remove('hidden'));
+                p1Op = 'x';
+                p2Op = 'x';
+            } else {
+                opContainers.forEach(c => c.classList.add('hidden'));
+                p1Op = mode;
+                p2Op = mode;
+            }
+
+            resetGame();
+        }
+
+        function showMenu() {
+            playBeep(440, 'sine', 0.1);
+            document.getElementById('win-modal').classList.add('hidden');
+            document.getElementById('start-menu').classList.remove('hidden');
+        }
+
+        function getRandomOp() {
+            const ops = ['x', ':', '+', '-'];
+            return ops[Math.floor(Math.random() * ops.length)];
+        }
+
+        // Generate Random Math Question (x, :, +, -)
         function generateQuestion(op) {
-            if (op === ':') {
+            let activeOp = op;
+            if (op === 'mix') {
+                activeOp = getRandomOp();
+            }
+
+            if (activeOp === ':') {
                 const answer = Math.floor(Math.random() * 9) + 1; // 1..9
                 const divisor = Math.floor(Math.random() * 8) + 2; // 2..9
                 const dividend = answer * divisor;
                 return { a: dividend, b: divisor, ans: answer, symbol: ':' };
-            } else {
+            } else if (activeOp === '+') {
+                const a = Math.floor(Math.random() * 25) + 1; // 1..25
+                const b = Math.floor(Math.random() * 25) + 1; // 1..25
+                return { a, b, ans: a + b, symbol: '+' };
+            } else if (activeOp === '-') {
+                const a = Math.floor(Math.random() * 30) + 10; // 10..39
+                const b = Math.floor(Math.random() * a) + 1;    // Hasil positif
+                return { a, b, ans: a - b, symbol: '-' };
+            } else { // 'x'
                 const a = Math.floor(Math.random() * 8) + 2; // 2..9
                 const b = Math.floor(Math.random() * 9) + 1; // 1..9
                 return { a, b, ans: a * b, symbol: '×' };
@@ -217,18 +316,28 @@
         }
 
         function setOperator(player, op) {
+            if (currentGameMode !== 'free') return; // Hanya bisa ganti di Mode Bebas
+            
+            const activeClassP1 = 'px-1.5 py-0.5 text-xs font-black rounded-md bg-blue-600 text-white shadow';
+            const activeClassP2 = 'px-1.5 py-0.5 text-xs font-black rounded-md bg-red-600 text-white shadow';
+            const inactiveClass = 'px-1.5 py-0.5 text-xs font-black rounded-md text-slate-600';
+
             if (player === 1) {
                 p1Op = op;
                 p1Q = generateQuestion(p1Op);
                 p1Input = "";
-                document.getElementById('p1-op-mult').className = op === 'x' ? 'px-2 py-0.5 text-xs font-black rounded-md bg-blue-600 text-white shadow' : 'px-2 py-0.5 text-xs font-black rounded-md text-slate-600';
-                document.getElementById('p1-op-div').className = op === ':' ? 'px-2 py-0.5 text-xs font-black rounded-md bg-blue-600 text-white shadow' : 'px-2 py-0.5 text-xs font-black rounded-md text-slate-600';
+                document.getElementById('p1-op-mult').className = op === 'x' ? activeClassP1 : inactiveClass;
+                document.getElementById('p1-op-div').className = op === ':' ? activeClassP1 : inactiveClass;
+                document.getElementById('p1-op-add').className = op === '+' ? activeClassP1 : inactiveClass;
+                document.getElementById('p1-op-sub').className = op === '-' ? activeClassP1 : inactiveClass;
             } else {
                 p2Op = op;
                 p2Q = generateQuestion(p2Op);
                 p2Input = "";
-                document.getElementById('p2-op-mult').className = op === 'x' ? 'px-2 py-0.5 text-xs font-black rounded-md bg-red-600 text-white shadow' : 'px-2 py-0.5 text-xs font-black rounded-md text-slate-600';
-                document.getElementById('p2-op-div').className = op === ':' ? 'px-2 py-0.5 text-xs font-black rounded-md bg-red-600 text-white shadow' : 'px-2 py-0.5 text-xs font-black rounded-md text-slate-600';
+                document.getElementById('p2-op-mult').className = op === 'x' ? activeClassP2 : inactiveClass;
+                document.getElementById('p2-op-div').className = op === ':' ? activeClassP2 : inactiveClass;
+                document.getElementById('p2-op-add').className = op === '+' ? activeClassP2 : inactiveClass;
+                document.getElementById('p2-op-sub').className = op === '-' ? activeClassP2 : inactiveClass;
             }
             render();
         }
@@ -328,12 +437,6 @@
             document.getElementById('win-modal').classList.add('hidden');
             render();
         }
-
-        window.onload = function() {
-            p1Q = generateQuestion(p1Op);
-            p2Q = generateQuestion(p2Op);
-            render();
-        };
     </script>
 </body>
 </html>
